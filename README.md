@@ -26,6 +26,12 @@ npm run build
 
 后端：
 ```
+#安装包：
+go get -v github.com/gin-contrib/cors
+go get -v github.com/gin-gonic/contrib/static
+go get -v github.com/gin-gonic/gin
+go get -v github.com/go-sql-driver/mysql
+
 #启动后端服务
 cd go && go run .
 ```
