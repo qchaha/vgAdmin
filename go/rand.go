@@ -6,6 +6,7 @@ import (
 	"time"
 )
 
+// 返回唯一随机Token
 func generateToken() string {
 	unix32bits := uint32(time.Now().UTC().Unix())
 

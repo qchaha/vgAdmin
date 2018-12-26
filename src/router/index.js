@@ -38,6 +38,7 @@ export const constantRouterMap = [
   }
 ]
 
+// 前端根据用户角色显示不同的菜单，通过meta字段的roles来控制
 export const asyncRouterMap = [
   {
     path: '/dashboard',

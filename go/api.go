@@ -12,6 +12,8 @@ import (
 
 func main() {
 	r := gin.Default()
+
+	// 跨域请求处理
 	r.Use(cors.New(cors.Config{
 		AllowOrigins: []string{"*"},
 		AllowMethods: []string{"*"},
@@ -24,10 +26,13 @@ func main() {
 		MaxAge: 12 * time.Hour,
 	}))
 
+	// 设定静态文件路径
 	r.Use(static.Serve("/", static.LocalFile("../dist", true)))
 
+	// 全局token池
 	tokenLocalPool := make(map[string]int)
 
+	// 登录接口
 	r.POST("/user/login", func(c *gin.Context) {
 		type requestBody struct {
 			USERNAME string `json:"username"`
@@ -120,6 +125,7 @@ func main() {
 		}
 	})
 
+	// 获取用户信息，每次刷新页面都会触发
 	r.GET("/user/info", func(c *gin.Context) {
 		type userInfo struct {
 			ROLES  []string `json:"roles"`
@@ -131,6 +137,8 @@ func main() {
 			username string
 			role     string
 		)
+
+		// 检查token是否存在来确认用户是否已经登录
 		token := c.Query("token")
 		sql := fmt.Sprintf("SELECT a.username, a.role FROM user_info a, token_pool b WHERE b.token = '%s' and a.username = b.username", token[:len(token)-1])
 		rows := dbQuery(sql)
@@ -165,12 +173,15 @@ func main() {
 		}
 	})
 
+	// 用户登出
 	r.POST("/user/logout", func(c *gin.Context) {
 		type token struct {
 			TOKEN string `json:"token"`
 		}
 		var t token
 		c.BindJSON(&t)
+
+		// 删除token，数据库和本地的
 		if dbModify("DELETE FROM token_pool WHERE token = ?", t.TOKEN[:len(t.TOKEN)-1]) {
 			// remove token from local token pool
 			if _, e := tokenLocalPool[t.TOKEN[:len(t.TOKEN)-1]]; e {
@@ -208,7 +219,10 @@ func main() {
 		}
 	})
 
+	// 获取用户管理表
 	r.GET("/user", func(c *gin.Context) {
+
+		// 所有的请求都需要先从header的X-Token字段来获取Token，不合法的Token会终止访问
 		token := c.GetHeader("X-Token")
 		if _, e := tokenLocalPool[token]; !e {
 			c.JSON(200, gin.H{
@@ -267,6 +281,7 @@ func main() {
 		})
 	})
 
+	// 新建用户
 	r.POST("/user/new", func(c *gin.Context) {
 		type items struct {
 			USERNAME         string `json:"username"`
@@ -310,6 +325,7 @@ func main() {
 		}
 	})
 
+	// 编辑用户信息
 	r.POST("/user/edit", func(c *gin.Context) {
 		type items struct {
 			USERNAME         string `json:"username"`
@@ -355,6 +371,7 @@ func main() {
 		}
 	})
 
+	// 删除用户
 	r.POST("/user/delete", func(c *gin.Context) {
 		token := c.GetHeader("X-Token")
 		if _, e := tokenLocalPool[token]; !e {

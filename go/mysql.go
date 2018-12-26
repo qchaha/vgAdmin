@@ -7,6 +7,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+// 连接数据库
 func dbConnect() *sql.DB {
 	dbUser := "root"
 	dbPassword := "root123"
@@ -26,6 +27,7 @@ func dbConnect() *sql.DB {
 	return db
 }
 
+// 查询数据库，返回行数据，用户自定义处理
 func dbQuery(sql string) *sql.Rows {
 	db := dbConnect()
 	defer db.Close()
@@ -38,26 +40,27 @@ func dbQuery(sql string) *sql.Rows {
 	return row
 }
 
+// 增删改数据库
 func dbModify(sql string, args ...interface{}) bool {
 	var rc bool
 	db := dbConnect()
 	defer db.Close()
 	ins, err := db.Prepare(sql)
 	if err != nil {
-		fmt.Println(sql)
+		//fmt.Println(sql)
 		fmt.Println("db prepare error...")
 		return false
 	}
 	defer ins.Close()
 	r, err := ins.Exec(args...)
 	if err != nil {
-		fmt.Println(sql)
+		//fmt.Println(sql)
 		fmt.Println("exec query error...")
 		return false
 	}
 	affectRows, err := r.RowsAffected()
 	if err != nil {
-		fmt.Println(sql)
+		//fmt.Println(sql)
 		fmt.Println("return affected rows error...")
 		return false
 	}
