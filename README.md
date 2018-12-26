@@ -3,9 +3,11 @@
 后端golang的gin框架，项目地址：https://github.com/gin-gonic/gin
 
 开发环境：
+```
 go version go1.11.2 linux/amd64
 npm 3.5.2
 node v8.10.0
+```
 
 前端：
 ```
@@ -28,4 +30,7 @@ npm run build
 cd go && go run .
 ```
 
-后端数据结构，执行src/sql下的sql语句
+后端数据结构：
+```
+执行src/sql下的sql语句
+```
